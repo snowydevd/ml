@@ -1,0 +1,316 @@
+{
+  "version": 1,
+  "pedido": "/want-to-learn Módulo 1, clase 1 de ROADMAP.md: mis primeros pasos con NumPy. Leé la sección \"Mi nivel\" antes de armar la guía: soy principiante total en ML y vengo de JavaScript/TypeScript.\n\nQuiero aprender:\n- Qué es un array de NumPy y en qué se diferencia de un array de JS\n- shape y dtype\n- Indexing y slicing (comparado con JS)\n- Operaciones vectorizadas: por qué en NumPy no se usa .map() ni loops\n- Funciones de agregación (mean, std, min, max) y qué significa axis\n- Broadcasting, explicado con un ejemplo chico\n\nCómo quiero la guía:\n- Un solo script: src/01_numpy_basico.py, con una celda \"# %%\" por paso\n- Ejemplo con datos de verdad: lecturas de temperatura de 3 sensores durante 5 días (una matriz de 5x3 que escribo a mano)\n- Último paso: normalizar esas lecturas, restando la media y dividiendo por la desviación estándar de cada sensor, y explicar en notas/01_numpy.md, con mis palabras, por qué esto va a importar en ML\n- En cada paso, explícame el concepto con una analogía o un ejemplo antes de pedirme que escriba código\n- Cada paso termina con un print para que vea el resultado y lo compare con lo que esperaba\n- Si una función de NumPy tiene parámetros raros, explícame solo los que voy a usar",
+  "titulo": "Primeros pasos con NumPy: sensores de temperatura",
+  "panorama": "Vas a armar una matriz de 5 días × 3 sensores y usarla para ver cada idea base de NumPy: shape, indexing, operaciones vectorizadas, agregaciones con axis y broadcasting. Cada celda `# %%` usa lo de la anterior y al final normalizás las lecturas por sensor, que es lo primero que se hace con los datos antes de entrenar un modelo. Cerrás escribiendo con tus palabras en notas/01_numpy.md por qué esto importa en ML.",
+  "pasoActual": 5,
+  "terminada": false,
+  "pasos": [
+    {
+      "id": 1,
+      "tipo": "crear-archivo",
+      "titulo": "Crear archivo",
+      "archivo": "src/01_numpy_basico.py",
+      "donde": "src",
+      "objetivo": "Crear el archivo vacío src/01_numpy_basico.py",
+      "conceptos": [],
+      "criterios": [],
+      "pistas": [],
+      "hecho": true,
+      "nivelPista": 0
+    },
+    {
+      "id": 2,
+      "tipo": "codigo",
+      "titulo": "Crear la matriz de temperaturas",
+      "archivo": "src/01_numpy_basico.py",
+      "donde": "Primera celda `# %%` del archivo, arriba de todo.",
+      "objetivo": "Importá NumPy y escribí a mano una matriz de 5 filas (días) × 3 columnas (sensores) con temperaturas con decimales. Imprimí la matriz, su `shape` y su `dtype`. Truco: poné un sensor en otra escala (por ejemplo, uno del motor a ~80 °C y dos ambiente a ~20 °C). Eso te va a servir en el último paso.",
+      "conceptos": [
+        {
+          "nombre": "Celdas `# %%`",
+          "explicacion": "Cada `# %%` arranca una celda que VS Code ejecuta por separado, como en un notebook. Las variables quedan en memoria entre celdas.",
+          "docs": "https://code.visualstudio.com/docs/python/jupyter-support-py"
+        },
+        {
+          "nombre": "ndarray (array de NumPy)",
+          "explicacion": "Un array de JS es una lista de cualquier cosa: `[1, 'a', {}]`, de largo variable y con arrays anidados que pueden tener largos distintos. Un `ndarray` es una grilla rectangular de números, todos del mismo tipo y guardados juntos en memoria. Por eso es mucho más rápido. Lo creás con `np.array(lista_de_listas)`.",
+          "docs": "https://numpy.org/doc/stable/user/absolute_beginners.html"
+        },
+        {
+          "nombre": "shape y dtype",
+          "explicacion": "`shape` es una tupla con el tamaño de cada dimensión: una matriz de 5 filas y 3 columnas tiene shape `(5, 3)`. `dtype` es el tipo único de todos los elementos: si escribís algún decimal va a ser `float64`, y si son todos enteros, `int64`.",
+          "docs": "https://numpy.org/doc/stable/reference/arrays.dtypes.html"
+        }
+      ],
+      "criterios": [
+        "Hay `import numpy as np` al principio del archivo",
+        "La primera celda arranca con `# %%`",
+        "Se crea con np.array una matriz de 5 filas × 3 columnas escrita a mano (lista de listas)",
+        "Los valores tienen decimales, así que el dtype es float64",
+        "Se imprimen la matriz, `.shape` y `.dtype`",
+        "Ojalá un sensor esté en otra escala (no es obligatorio, pero conviene)"
+      ],
+      "pistas": [
+        "Primero el import con el alias de siempre de la comunidad. Después pensá la matriz como un array de JS de 5 arrays con 3 números cada uno.",
+        "`np.array(...)` recibe una lista de listas de Python. `shape` y `dtype` son atributos del array, no métodos: van sin paréntesis.",
+        "Escribí: celda `# %%` → import → variable `lecturas = np.array([[...], [...], ...])` con 5 filas de 3 → tres prints: el array, `lecturas.shape` y `lecturas.dtype`."
+      ],
+      "hecho": true,
+      "nivelPista": 0,
+      "ultimaRevision": {
+        "aprobado": true,
+        "mensaje": "Bien: matriz de 5×3 escrita a mano, convertida con `np.array`, y como todos los valores tienen decimales el `dtype` te da `float64` y el `shape` `(5, 3)`. Lo único que te falta es el truco opcional: los tres sensores están en la misma escala (~14 a 30 °C).",
+        "problemas": [],
+        "sugerencias": [
+          "Cambiá una columna entera a otra escala (ej. un sensor de motor a ~80 °C): en el último paso vas a ver mucho más claro para qué sirve normalizar.",
+          "Ponele nombres que digan qué son, tipo `temperaturas` en vez de `arr`: lo vas a usar en los 7 pasos que siguen.",
+          "Un comentario arriba de la matriz que diga qué es cada eje (filas = días, columnas = sensores) te va a ahorrar dudas cuando llegues a `axis`."
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "tipo": "codigo",
+      "titulo": "Leer valores con indexing y slicing",
+      "archivo": "src/01_numpy_basico.py",
+      "donde": "Celda nueva `# %%` abajo de la primera.",
+      "objetivo": "Sacá e imprimí: (1) la lectura del día 3, sensor 2; (2) todas las lecturas de un día; (3) todas las lecturas de un sensor (una columna); (4) los primeros 3 días. Antes de cada print, anotá en un comentario qué shape esperás.",
+      "conceptos": [
+        {
+          "nombre": "Indexing `[fila, columna]`",
+          "explicacion": "En JS hacés `m[2][1]`. En NumPy se escribe `m[2, 1]`, con una coma dentro de un solo par de corchetes. Igual que en JS, los índices arrancan en 0: el día 3 es el índice 2.",
+          "docs": "https://numpy.org/doc/stable/user/basics.indexing.html"
+        },
+        {
+          "nombre": "Slicing con `:`",
+          "explicacion": "`inicio:fin` es como `.slice(inicio, fin)` de JS: el fin no se incluye. Un `:` solo significa \"todo en este eje\". Así, `m[:, 0]` es la columna 0 entera, algo que en JS te obligaría a hacer un `.map()`. Ojo: un slice de NumPy es una vista del original y no una copia como en JS. Si lo modificás, cambia la matriz.",
+          "docs": "https://numpy.org/doc/stable/user/basics.indexing.html#slicing-and-striding"
+        }
+      ],
+      "criterios": [
+        "La celda arranca con `# %%`",
+        "Se accede a un valor puntual con la sintaxis `[i, j]` (vale si usa `[i][j]`, pero se le sugiere la coma)",
+        "Se saca una fila completa (un día)",
+        "Se saca una columna completa con `[:, j]`",
+        "Se sacan los primeros 3 días con slicing `[:3]` o `[0:3]`",
+        "Cada resultado tiene su print",
+        "Los índices coinciden con lo pedido (día 3 = índice 2, sensor 2 = índice 1)"
+      ],
+      "pistas": [
+        "Las filas son días y las columnas son sensores. Contá desde 0.",
+        "Usá un solo par de corchetes con coma: `[fila, columna]`. Para \"todas las filas\" o \"todas las columnas\", poné `:` en ese lugar.",
+        "Escribí cuatro líneas: `lecturas[2, 1]`, `lecturas[algún_día]` (o `[día, :]`), `lecturas[:, algún_sensor]` y `lecturas[:3]`, cada una adentro de un print. Si querés, imprimí también el `.shape` de cada resultado para comparar con tu comentario."
+      ],
+      "hecho": true,
+      "nivelPista": 0,
+      "ultimaRevision": {
+        "aprobado": true,
+        "mensaje": "Los cuatro accesos están bien: `arr[2, 1]` da 27.0 (día 3, sensor 2), y sacaste la fila, la columna con `[:, 2]` y los primeros 3 días con `[0:3]`. Solo te faltó anotar el shape que esperabas antes de cada print.",
+        "problemas": [],
+        "sugerencias": [
+          "Anotá en un comentario el shape que esperás de cada resultado y verificalo con `.shape`: el valor puntual, la fila, la columna y el slice de 3 días tienen shapes distintos, y eso te va a servir cuando lleguemos a `axis`.",
+          "`arr[0:3]` se puede escribir `arr[:3]`: si arrancás desde el principio, el 0 se omite.",
+          "Fijate que `arr[:, 2]` se imprime como una lista plana y no como columna vertical: al sacar una columna, NumPy devuelve un array de 1 dimensión."
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "tipo": "codigo",
+      "titulo": "Pasar todo a Fahrenheit sin loops",
+      "archivo": "src/01_numpy_basico.py",
+      "donde": "Celda nueva `# %%` abajo de la de indexing.",
+      "objetivo": "Convertí la matriz entera a Fahrenheit (F = C × 9/5 + 32) en una sola expresión, sin `for` ni `.map()`. Después creá un array de True/False que diga qué lecturas superan los 25 °C. Imprimí los dos.",
+      "conceptos": [
+        {
+          "nombre": "Operaciones vectorizadas",
+          "explicacion": "En JS harías `m.map(fila => fila.map(c => c * 9/5 + 32))`. En NumPy escribís la cuenta como si `m` fuera un número y se aplica a cada elemento. Por adentro corre un loop en C, que es entre 10 y 100 veces más rápido que un loop de Python. En ML los arrays tienen millones de números, así que escribir loops a mano es lentísimo.",
+          "docs": "https://numpy.org/doc/stable/user/basics.ufuncs.html"
+        },
+        {
+          "nombre": "Comparación elemento a elemento",
+          "explicacion": "`m > 25` no devuelve un solo bool. Devuelve un array de la misma shape con True/False en cada posición, con dtype `bool`.",
+          "docs": "https://numpy.org/doc/stable/user/absolute_beginners.html#basic-array-operations"
+        }
+      ],
+      "criterios": [
+        "La celda arranca con `# %%`",
+        "La conversión a Fahrenheit es una sola expresión vectorizada sobre la matriz (sin for, list comprehension ni map)",
+        "La fórmula es correcta: × 9/5 + 32",
+        "Hay una comparación vectorizada contra 25",
+        "Se imprimen los dos resultados (y opcionalmente sus shape/dtype)",
+        "No se pisa la matriz original `lecturas` (se guarda en otra variable)"
+      ],
+      "pistas": [
+        "Olvidate de recorrer la matriz y escribí la fórmula como si `lecturas` fuera un solo número.",
+        "Los operadores `*`, `/`, `+` y `>` de Python funcionan elemento a elemento sobre un ndarray. Guardá cada resultado en una variable nueva.",
+        "Escribí: `fahrenheit = <fórmula usando lecturas>`, `calientes = <lecturas comparado con 25>` y después dos prints. Fijate que la shape de los dos siga siendo (5, 3)."
+      ],
+      "hecho": true,
+      "nivelPista": 0,
+      "ultimaRevision": {
+        "aprobado": true,
+        "mensaje": "Bien: `(arr * 9/5) + 32` convierte toda la matriz de una, sin loops, y `arr > 25.0` te devuelve la máscara de booleanos sin pisar `arr`. Lo separaste en dos celdas en vez de una, pero funciona igual.",
+        "problemas": [],
+        "sugerencias": [
+          "Fijate que `arr[0, 0]` es 25.0 y en la máscara da False: `>` es estricto, igual que en JS.",
+          "Imprimí `supera.dtype`: vas a ver `bool`, distinto del `float64` de `arr`.",
+          "`FAHRENHEIT_MAT` en mayúsculas se lee como constante en Python; para un resultado calculado va mejor snake_case, tipo `fahrenheit`."
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "tipo": "codigo",
+      "titulo": "Resumir con mean, std, min, max y axis",
+      "archivo": "src/01_numpy_basico.py",
+      "donde": "Celda nueva `# %%` abajo de la de Fahrenheit.",
+      "objetivo": "Calculá e imprimí: la media de toda la matriz, la media por sensor, la media por día, y el mínimo, el máximo y la desviación estándar por sensor. Guardá la media y la std por sensor en variables, porque las vas a usar después.",
+      "conceptos": [
+        {
+          "nombre": "Funciones de agregación (mean, std, min, max)",
+          "explicacion": "Reducen muchos números a uno, como un `.reduce()`. La media de [20, 22, 24] es 22. La desviación estándar mide cuánto se alejan los datos de la media, en promedio. Con [1, 2, 3]: la media es 2, las distancias son -1, 0, 1, al cuadrado 1, 0, 1, el promedio es 0.667 y la raíz da ≈ 0.816. `np.std` hace esa cuenta por defecto (con `ddof=0`, que no hace falta tocar).",
+          "docs": "https://numpy.org/doc/stable/reference/generated/numpy.std.html"
+        },
+        {
+          "nombre": "El parámetro `axis`",
+          "explicacion": "`axis` es el eje que se colapsa. `axis=0` recorre hacia abajo, por las filas, y te deja un valor por columna: shape (3,), uno por sensor. `axis=1` recorre de costado y te deja uno por fila: shape (5,), uno por día. Sin `axis`, junta todo en un solo número. Confunde a todo el mundo al principio, así que imprimí la shape para confirmar.",
+          "docs": "https://numpy.org/doc/stable/reference/generated/numpy.mean.html"
+        }
+      ],
+      "criterios": [
+        "La celda arranca con `# %%`",
+        "Media global sin axis",
+        "Media por sensor con axis=0, con shape (3,)",
+        "Media por día con axis=1, con shape (5,)",
+        "min, max y std por sensor con axis=0",
+        "La media y la std por sensor quedan guardadas en variables con nombre claro (ej. `media_sensor`, `std_sensor`)",
+        "Hay prints de los resultados"
+      ],
+      "pistas": [
+        "Primero decidí qué querés que te quede: un número por sensor (columnas) o uno por día (filas).",
+        "Usá `.mean()`, `.std()`, `.min()` y `.max()` como métodos del array (o `np.mean(arr, axis=...)`). El único parámetro que necesitás es `axis`.",
+        "Escribí: `lecturas.mean()` → `media_sensor = lecturas.mean(axis=0)` → `lecturas.mean(axis=1)` → min/max/std con `axis=0` (guardá la std en `std_sensor`) → prints con etiqueta, y sumá `.shape` en alguno para confirmar."
+      ],
+      "hecho": true,
+      "nivelPista": 0,
+      "ultimaPregunta": {
+        "pregunta": "entonces axis solo puede ser 1 o 0?",
+        "respuesta": "No. En tu matriz sí, porque tiene 2 dimensiones: hay un eje por cada número de `arr.shape`. Con `(5, 3)` tenés el 0 (días) y el 1 (sensores).\n\nSi el array tuviera shape `(4, 5, 3)` (4 semanas, 5 días, 3 sensores), existiría también `axis=2`. Un array 1D solo tiene `axis=0`.\n\nOtras opciones:\n- Sin `axis` (o `axis=None`): resume todo en un solo número, como tu `arr.mean()`.\n- Negativos: `axis=-1` es el último eje, igual que los índices negativos.\n- Una tupla: `axis=(0, 1)` colapsa varios ejes a la vez.\n\nRegla para no confundirte: el eje que pasás es el que **desaparece**. En un array `(2, 4)`, `sum(axis=0)` devuelve 4 valores y `sum(axis=1)` devuelve 2.\n\nOjo: tu `arr.mean(axis = 0)` de la línea 51 no tiene `print` ni se guarda en una variable, así que se pierde.\n\nDocs: https://numpy.org/doc/stable/reference/generated/numpy.mean.html"
+      },
+      "ultimaRevision": {
+        "aprobado": true,
+        "mensaje": "Está bien: media global sin `axis`, por sensor con `axis=0`, por día con `axis=1`, y min, max y std por sensor. `col_mean` y `col_std` quedan guardadas para la normalización.",
+        "problemas": [],
+        "sugerencias": [
+          "Los prints salen sin etiqueta: agregales un texto (como hacías en el loop comentado) para saber qué número es cuál.",
+          "`col_mean` / `col_std` funcionan, pero `media_sensor` / `std_sensor` dicen qué significan los datos, no solo la forma de la matriz.",
+          "Borrá los loops comentados (líneas 35-47): ya los reemplazaste con `axis`. Si querés guardar la comparación, anotala en notas/01_numpy.md."
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "tipo": "codigo",
+      "titulo": "Centrar los datos con broadcasting",
+      "archivo": "src/01_numpy_basico.py",
+      "donde": "Celda nueva `# %%` abajo de la de agregaciones.",
+      "objetivo": "Restale a la matriz (5, 3) el vector de medias por sensor (3,) en una sola resta. Imprimí el resultado y la media por sensor del resultado, que tiene que dar ~0 en cada columna.",
+      "conceptos": [
+        {
+          "nombre": "Broadcasting",
+          "explicacion": "Cuando operás arrays de shapes distintas, NumPy \"estira\" el chico para que encaje con el grande, sin copiar datos. Ejemplo chico: [[1, 2], [3, 4]] - [1, 2] da [[0, 0], [2, 2]], porque el [1, 2] se resta a cada fila. Funciona porque las shapes se comparan desde la derecha: (5, 3) y (3,) coinciden en el 3. En JS esto directamente no existe.",
+          "docs": "https://numpy.org/doc/stable/user/basics.broadcasting.html"
+        }
+      ],
+      "criterios": [
+        "La celda arranca con `# %%`",
+        "Se resta `media_sensor` (shape (3,)) a `lecturas` (shape (5, 3)) en una sola operación, sin loops ni np.tile/repeat",
+        "El resultado se guarda en una variable nueva (ej. `centradas`)",
+        "Se imprime el resultado",
+        "Se imprime la media por sensor del resultado (axis=0) y da ~0 (puede salir algo como 1e-15, y es correcto)"
+      ],
+      "pistas": [
+        "Ya tenés la media por sensor guardada del paso anterior. Pensá: ¿a qué le quiero restar qué?",
+        "Es un `-` común entre la matriz y el vector. Para verificar, usá `.mean(axis=0)` sobre el resultado.",
+        "Escribí: `centradas = lecturas - media_sensor` → print de `centradas` → print de `centradas.mean(axis=0)`. Si ves algo como `-3.5e-15`, es cero con error de redondeo de punto flotante."
+      ],
+      "hecho": false,
+      "nivelPista": 0
+    },
+    {
+      "id": 7,
+      "tipo": "codigo",
+      "titulo": "Normalizar las lecturas por sensor",
+      "archivo": "src/01_numpy_basico.py",
+      "donde": "Última celda `# %%` del archivo, abajo de la de broadcasting.",
+      "objetivo": "Dividí las lecturas centradas por la std de cada sensor para obtener `normalizadas`. Imprimí la matriz y comprobá con prints que cada sensor queda con media ≈ 0 y std ≈ 1. Fijate que el sensor del motor ya no se diferencia de los otros.",
+      "conceptos": [
+        {
+          "nombre": "Estandarización (z-score)",
+          "explicacion": "z = (x − media) / std. En palabras: a cuántas desviaciones estándar de lo normal está esta lectura. Ejemplo: si un sensor tiene media 20 y std 2, una lectura de 24 da z = 2, o sea \"dos pasos arriba de lo normal\". Así sensores con escalas distintas quedan comparables. Es lo que hace `StandardScaler` de scikit-learn, que vas a usar más adelante.",
+          "docs": "https://scikit-learn.org/stable/modules/preprocessing.html#standardization-or-mean-removal-and-variance-scaling"
+        }
+      ],
+      "criterios": [
+        "La celda arranca con `# %%`",
+        "Se divide `centradas` (o `lecturas - media_sensor`) por `std_sensor` usando broadcasting, sin loops",
+        "El resultado se guarda en `normalizadas` (o un nombre claro)",
+        "Se imprime la matriz normalizada",
+        "Se imprimen `.mean(axis=0)` (≈ 0) y `.std(axis=0)` (≈ 1) del resultado",
+        "Opcional: usa np.round para que el print se lea mejor"
+      ],
+      "pistas": [
+        "Es el mismo truco del paso anterior, pero con una división y la otra variable que guardaste.",
+        "Broadcasting otra vez: (5, 3) / (3,). Para verificar, usá `.mean(axis=0)` y `.std(axis=0)` sobre el resultado. Si querés un print más limpio, `np.round(arr, 2)` redondea a 2 decimales.",
+        "Escribí: `normalizadas = centradas / std_sensor` → print de la matriz → print de su media por sensor → print de su std por sensor. Compará la columna del motor antes y después."
+      ],
+      "hecho": false,
+      "nivelPista": 0
+    },
+    {
+      "id": 8,
+      "tipo": "crear-archivo",
+      "titulo": "Crear archivo",
+      "archivo": "notas/01_numpy.md",
+      "donde": "notas",
+      "objetivo": "Crear el archivo vacío notas/01_numpy.md",
+      "conceptos": [],
+      "criterios": [],
+      "pistas": [],
+      "hecho": false,
+      "nivelPista": 0
+    },
+    {
+      "id": 9,
+      "tipo": "codigo",
+      "titulo": "Explicar con tus palabras por qué normalizar",
+      "archivo": "notas/01_numpy.md",
+      "donde": "Archivo nuevo, desde arriba.",
+      "objetivo": "Escribí una nota corta con tus palabras: qué es un ndarray comparado con un array de JS, qué hace `axis` y qué es broadcasting (con tu ejemplo de los sensores), y sobre todo por qué normalizar va a importar en ML. Pensá qué pasa si un modelo compara \"80 °C del motor\" con \"20 °C ambiente\" sin normalizar.",
+      "conceptos": [
+        {
+          "nombre": "Escala de las features",
+          "explicacion": "En ML cada columna de datos es una feature. Si una va de 0 a 100 y otra de 0 a 1, muchos modelos le dan más peso a la grande solo por la escala, y el entrenamiento (gradient descent, Módulo 2) se vuelve lento o inestable. Normalizar las pone a todas en pie de igualdad.",
+          "docs": "https://developers.google.com/machine-learning/crash-course/numerical-data/normalization"
+        }
+      ],
+      "criterios": [
+        "El archivo notas/01_numpy.md existe y tiene contenido propio, no copiado de docs",
+        "Compara ndarray con array de JS (tipo único, shape rectangular, velocidad/vectorización)",
+        "Explica axis con sus palabras (axis=0 → un valor por columna)",
+        "Explica broadcasting con el ejemplo de restar la media por sensor",
+        "Explica por qué normalizar importa en ML: features en escalas distintas, comparabilidad, algo sobre el entrenamiento",
+        "Menciona al menos un resultado que vio en sus prints (ej. media ≈ 0, std ≈ 1)"
+      ],
+      "pistas": [
+        "Volvé a mirar los prints del último paso: ¿qué cambió en la columna del motor? Arrancá por ahí.",
+        "Armalo con títulos cortos en Markdown (`##`), uno por idea: ndarray vs JS, axis, broadcasting, normalización en ML.",
+        "Para cada sección: 1) qué es en una frase, 2) tu ejemplo con los sensores, 3) en la de normalización, qué problema resuelve cuando un modelo recibe columnas en escalas distintas."
+      ],
+      "hecho": false,
+      "nivelPista": 0
+    }
+  ]
+}
